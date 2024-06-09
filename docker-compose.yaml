@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  # kmeans:
+  #   image: kupaqu/kmeans
+  #   container_name: kmeans
+  #   build:
+  #     context: spark/.
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '4040:4040'
+  #   environment:
+  #     - SPARK_MODE=master
+  #   networks:
+  #     - local
+  
+  clickhouse:
+    hostname: clickhouse
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+      - '9009:9009'
+    networks:
+      - local
+
+  datamart:
+    container_name: datamart
+    build:
+      context: datamart/.
+      dockerfile: Dockerfile
+    ports:
+      - '25565:25565'
+    networks:
+      - local
+
+networks:
+  local:
+    name: local
+    driver: bridge
+    external: true

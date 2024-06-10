@@ -1,5 +1,6 @@
 import configparser
 import requests
+import time
 
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
@@ -46,10 +47,21 @@ if __name__ == '__main__':
                                     .getOrCreate()
     
     host = config['datamart']['host']
-    port = config['datamart']['port']
+    port = config['datamart']['http_port']
     url = f'http://{host}:{port}/get_food_data'
 
-    response = requests.get(url)
+    for i in range(100):
+        time.sleep(10)
+        try:
+            response = requests.get(url)
+        except ConnectionError:
+            continue
+    
+    if response.status_code != 200:
+        log.error(f'No data from DataMart. Got {response.status_code} code.')
+        spark.stop()
+        exit(1)
+
     df = spark.createDataFrame(response.json())
     log.info(f"Got processed dataset with schema: {df.schema}")
 

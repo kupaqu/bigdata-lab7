@@ -1,4 +1,5 @@
 import configparser
+import requests
 
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
@@ -6,8 +7,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 
 from logger import Logger
-from preprocess import read_csv, assemble, scale, df_to_dbtable, dbtable_to_df
-from database import Database
 
 SHOW_LOG = True
 
@@ -30,6 +29,9 @@ class KmeansPredictor:
         return preds
 
 if __name__ == '__main__':
+    logger = Logger(SHOW_LOG)
+    log = logger.get_logger(__name__)
+
     config = configparser.ConfigParser()
     config.read('config.ini')
 
@@ -43,24 +45,16 @@ if __name__ == '__main__':
                                 .config('spark.driver.extraClassPath', config['spark']['clickhouse_connector']) \
                                     .getOrCreate()
     
-    db = Database(spark)
-    db.create_db('lab6')
+    host = config['datamart']['host']
+    port = config['datamart']['port']
+    url = f'http://{host}:{port}/get_food_data'
 
-    data_path = config['data']['openfoodfacts']
-
-    # load csv to clickhouse
-    df = read_csv(data_path, spark)
-    df_to_dbtable(df, 'lab6.openfoodfacts', db)
-
-    # download from clickhouse
-    df = dbtable_to_df('lab6.openfoodfacts', db)
-    # df = assemble(df)
-    # df = scale(df)
+    response = requests.get(url)
+    df = spark.createDataFrame(response.json())
+    log.info(f"Got processed dataset with schema: {df.schema}")
 
     kmeans = KmeansPredictor()
     preds = kmeans.fit_predict(df)
-
-    # load predictions to clickhouse
-    df_to_dbtable(preds.select('prediction'), 'lab6.predictions', db)
+    log.info(f"Kmeans fitted and predicted.")
 
     spark.stop()

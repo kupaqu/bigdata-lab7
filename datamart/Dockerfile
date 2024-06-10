@@ -4,6 +4,4 @@ WORKDIR /app
 
 COPY . /app/.
 
-# CMD ["sbt", "compile"]
-
 CMD ["sbt", "runMain DataMart"]

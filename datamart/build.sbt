@@ -28,4 +28,5 @@ resolvers ++= Seq(
   "Apache Repository" at "https://repo1.maven.org/maven2/",
   //"Oracle Maven Repository" at "https://maven.oracle.com"
 )
+
 unmanagedJars in Compile += baseDirectory.value / "lib" / "clickhouse-native-jdbc-shaded-2.7.1.jar"

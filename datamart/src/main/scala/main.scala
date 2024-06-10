@@ -96,8 +96,8 @@ object DataMart {
     val route = path("get_food_data") {
       get {
         var df = read(spark, "default.food")
-        df = assemble(df)
-        df = scale(df)
+        // df = assemble(df)
+        // df = scale(df)
 
         println("Loaded and processed: ")
         df.printSchema()

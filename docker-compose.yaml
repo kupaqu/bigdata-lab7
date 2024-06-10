@@ -15,6 +15,7 @@ services:
   datamart:
     depends_on:
       - clickhouse
+    image: kupaqu/datamart
     hostname: datamart
     container_name: datamart
     build:

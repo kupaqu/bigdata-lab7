@@ -8,6 +8,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
 
 from logger import Logger
+from preprocess import assemble, scale
 
 SHOW_LOG = True
 
@@ -65,7 +66,8 @@ if __name__ == '__main__':
         exit(1)
 
     df = spark.createDataFrame(response.json())
-    # df = spark.read.json('C:\\Users\\fccfc\\bigdata-lab7\\data.json')
+    df = assemble(df)
+    df = scale(df)
     log.info(f"Got processed dataset with schema: {df.schema}")
 
     kmeans = KmeansPredictor()

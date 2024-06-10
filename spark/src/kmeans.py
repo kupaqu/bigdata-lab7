@@ -65,6 +65,7 @@ if __name__ == '__main__':
         exit(1)
 
     df = spark.createDataFrame(response.json())
+    # df = spark.read.json('C:\\Users\\fccfc\\bigdata-lab7\\data.json')
     log.info(f"Got processed dataset with schema: {df.schema}")
 
     kmeans = KmeansPredictor()

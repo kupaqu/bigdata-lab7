@@ -51,10 +51,12 @@ if __name__ == '__main__':
     url = f'http://{host}:{port}/get_food_data'
 
     for i in range(100):
-        time.sleep(10)
+        time.sleep(6)
         try:
             response = requests.get(url)
-        except ConnectionError:
+            if response.status_code == 200:
+                break
+        except requests.ConnectionError:
             continue
     
     if response.status_code != 200:
